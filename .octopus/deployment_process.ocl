@@ -317,9 +317,13 @@ step "deploy-canary-phase-3" {
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
             Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
+                $ErrorActionPreference = "Continue"
+                
                 $deployment = $OctopusParameters["Project.Deployment.Name"]
                 
                 kubectl scale --current-replicas=3 --replicas=1 deployment/$deployment
+                
+                $LastExitCode = 0
                 EOT
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
@@ -490,9 +494,9 @@ step "delete-canary-deployment" {
 }
 
 step "detect-cancelled-canary" {
-    name = "Detect cancelled canary"
+    name = "Detect cancelled canary rollout"
 
-    action {
+    action "detect-cancelled-canary-rollout" {
         action_type = "Octopus.Script"
         properties = {
             Octopus.Action.Script.ScriptBody = <<-EOT
