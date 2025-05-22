@@ -101,7 +101,7 @@ step "scale-up-existing-deployment" {
 step "deploy-audit-deployment" {
     name = "Deploy canary phase 1"
     properties = {
-        Octopus.Action.TargetRoles = "octopub"
+        Octopus.Action.TargetRoles = "octopub-audits"
     }
 
     action "deploy-canary-phase-1" {
