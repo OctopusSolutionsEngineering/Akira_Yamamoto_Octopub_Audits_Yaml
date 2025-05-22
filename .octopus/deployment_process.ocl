@@ -429,6 +429,17 @@ step "update-main-audit-app-service" {
             Octopus.Action.Script.ScriptSource = "Inline"
         }
         worker_pool_variable = ""
+
+        packages "octopub-audit-microservice-mysql" {
+            acquisition_location = "NotAcquired"
+            feed = "docker-hub"
+            package_id = "octopussamples/octopub-audit-microservice-mysql"
+            properties = {
+                Extract = "False"
+                Purpose = "DockerImageReference"
+                SelectionMode = "immediate"
+            }
+        }
     }
 }
 
