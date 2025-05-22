@@ -1,7 +1,7 @@
 step "create-namespace-if-not-exists" {
     name = "Create namespace if not exists"
     properties = {
-        Octopus.Action.TargetRoles = "octopub"
+        Octopus.Action.TargetRoles = "octopub-audits"
     }
 
     action {
@@ -65,6 +65,7 @@ step "create-audit-app-service" {
                       name: http-audit
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
         worker_pool_variable = ""
@@ -80,6 +81,7 @@ step "scale-up-existing-deployment" {
     action {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $ErrorActionPreference = "Continue"
                 
@@ -205,6 +207,7 @@ step "add-canary-pods-to-service" {
                       name: http-audit
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
         worker_pool_variable = ""
@@ -240,6 +243,7 @@ step "approve-canary-phase-1" {
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "True"
             Octopus.Action.Manual.Instructions = "Approve canary phase 1"
+            Octopus.Action.RunOnServer = "false"
         }
     }
 }
@@ -254,6 +258,7 @@ step "deploy-canary-phase-2" {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $deployment = $OctopusParameters["Project.Deployment.Name"] + "-canary"
                 
@@ -295,6 +300,7 @@ step "approve-canary-phase-2" {
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "True"
             Octopus.Action.Manual.Instructions = "Approve canary phase 2"
+            Octopus.Action.RunOnServer = "false"
         }
     }
 }
@@ -309,6 +315,7 @@ step "deploy-canary-phase-3" {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $deployment = $OctopusParameters["Project.Deployment.Name"]
                 
@@ -350,6 +357,7 @@ step "approve-canary-phase-3" {
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "True"
             Octopus.Action.Manual.Instructions = "Approve canary phase 2"
+            Octopus.Action.RunOnServer = "false"
         }
     }
 }
@@ -413,6 +421,7 @@ step "update-main-audit-app-service" {
                               value: "true"
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
         worker_pool_variable = ""
@@ -450,6 +459,7 @@ step "remove-canary-pods-from-service" {
                       name: http-audit
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
         worker_pool_variable = ""
@@ -466,6 +476,7 @@ step "delete-canary-deployment" {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $deployment = $OctopusParameters["Project.Deployment.Name"] + "-canary"
                 
@@ -518,6 +529,7 @@ step "rollback-canary-deployment" {
     action {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
+            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $ErrorActionPreference = "Continue"
                 
