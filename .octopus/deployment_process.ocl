@@ -65,10 +65,9 @@ step "create-audit-app-service" {
                       name: http-audit
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
@@ -81,7 +80,6 @@ step "scale-up-existing-deployment" {
     action {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $ErrorActionPreference = "Continue"
                 
@@ -94,7 +92,7 @@ step "scale-up-existing-deployment" {
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
@@ -159,10 +157,9 @@ step "deploy-audit-deployment" {
             Octopus.Action.KubernetesContainers.CustomResourceYamlFileName = "*.yaml"
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
             Octopus.Action.Package.JsonConfigurationVariablesTargets = "**/*.{yml,yaml}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
 
         packages "octopub-audit-microservice-mysql" {
             acquisition_location = "NotAcquired"
@@ -207,10 +204,9 @@ step "add-canary-pods-to-service" {
                       name: http-audit
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
@@ -258,7 +254,6 @@ step "deploy-canary-phase-2" {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $deployment = $OctopusParameters["Project.Deployment.Name"] + "-canary"
                 
@@ -267,7 +262,7 @@ step "deploy-canary-phase-2" {
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
@@ -315,7 +310,6 @@ step "deploy-canary-phase-3" {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $ErrorActionPreference = "Continue"
                 
@@ -328,7 +322,7 @@ step "deploy-canary-phase-3" {
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
@@ -425,10 +419,9 @@ step "update-main-audit-app-service" {
                               value: "true"
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
 
         packages "octopub-audit-microservice-mysql" {
             acquisition_location = "NotAcquired"
@@ -474,10 +467,9 @@ step "remove-canary-pods-from-service" {
                       name: http-audit
                 EOT
             Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
             Octopus.Action.Script.ScriptSource = "Inline"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
@@ -586,7 +578,7 @@ step "rollback-canary-deployment" {
     action {
         action_type = "Octopus.KubernetesRunScript"
         properties = {
-            Octopus.Action.RunOnServer = "false"
+            Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 $ErrorActionPreference = "Continue"
                 
@@ -605,6 +597,6 @@ step "rollback-canary-deployment" {
             Octopus.Action.Script.ScriptSource = "Inline"
             Octopus.Action.Script.Syntax = "PowerShell"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
