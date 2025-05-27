@@ -488,19 +488,61 @@ step "delete-canary-deployment" {
     }
 
     action {
-        action_type = "Octopus.KubernetesRunScript"
+        action_type = "Octopus.KubernetesDeployRawYaml"
         properties = {
-            Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
-            Octopus.Action.RunOnServer = "false"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $deployment = $OctopusParameters["Project.Deployment.Name"] + "-canary"
-                
-                kubectl delete deployment $deployment
+            Octopus.Action.Kubernetes.DeploymentTimeout = "180"
+            Octopus.Action.Kubernetes.ResourceStatusCheck = "True"
+            Octopus.Action.Kubernetes.ServerSideApply.Enabled = "True"
+            Octopus.Action.Kubernetes.ServerSideApply.ForceConflicts = "True"
+            Octopus.Action.KubernetesContainers.CustomResourceYaml = <<-EOT
+                apiVersion: apps/v1
+                kind: Deployment
+                metadata:
+                  name: #{Project.Deployment.Name}-canary
+                spec:
+                  replicas: 0
+                  selector:
+                    matchLabels:
+                      component: #{Project.Labels.Component}
+                      type: canary
+                  template:
+                    metadata:
+                      labels:
+                        component: #{Project.Labels.Component}
+                        type: canary
+                    spec:
+                      containers:
+                        - name: auditservice
+                          image: octopussamples/octopub-audit-microservice-mysql:#{Project.Container.Tag}
+                          ports:
+                            - name: http-audit
+                              containerPort: 10000
+                          env:
+                            - name: DATABASE_PASSWORD
+                              valueFrom:
+                                secretKeyRef:
+                                  name: database-credentials
+                                  key: database-password
+                            - name: DATABASE_HOSTNAME
+                              value: "#{Octopub.Yaml.Database.Server.Name}"
+                            - name: DATABASE_PORT
+                              value: "3306"
+                            - name: DATABASE_NAME
+                              value: "#{Octopub.Yaml.Database.Name}"
+                            - name: DATABASE_USERNAME
+                              valueFrom:
+                                secretKeyRef:
+                                  name: database-credentials
+                                  key: database-user
+                            - name: MIGRATE_AT_START
+                              value: "false"
+                            - name: COGNITO_DISABLE_AUTH
+                              value: "true"
                 EOT
+            Octopus.Action.KubernetesContainers.Namespace = "#{Octopub.Yaml.Cluster.Namespace}"
             Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
         }
-        worker_pool_variable = ""
+        worker_pool = "hosted-ubuntu"
     }
 }
 
